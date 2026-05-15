@@ -1,0 +1,51 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#movement-container {
+    width: 90%;
+    /* 잘림 방지를 위해 강제 비율 제거 */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 3rem;
+    box-sizing: border-box;
+}
+
+/* 화면 1과 대비되는 느낌 (흰색 텍스트) */
+.movement-text {
+    font-size: clamp(2rem, 5vw, 5rem);
+    font-weight: 900;
+    color: white;
+    line-height: 1.3;
+    margin: 0;
+    letter-spacing: -1px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap; /* 줄바꿈 유지 */
+}
+
+/* 커서 애니메이션 */
+.cursor {
+    display: inline-block;
+    width: 40px;
+    height: 6vw;
+    background-color: white;
+    animation: blink 1s step-end infinite;
+    vertical-align: bottom;
+    margin-left: 10px;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}

@@ -1,0 +1,24 @@
+# 수집 주기(초)
+poll_seconds: 60
+
+# 포함 키워드(하나라도 포함되면 수집) - 비워두면 전체 수집
+include_keywords:
+
+# 제외 키워드(하나라도 포함되면 제외)
+exclude_keywords:
+  - 광고
+  - sponsored
+
+# RSS 피드 목록 (원하는 대로 추가/삭제)
+feeds:
+  - name: "Google World News"
+    url: "https://news.google.com/rss?hl=en&gl=US&ceid=US:en"
+  - name: "BBC World"
+    url: "http://feeds.bbci.co.uk/news/world/rss.xml"
+  - name: "AP World"
+    url: "https://feeds.apnews.com/apf-intlnews"
+  - name: "NYTimes World"
+    url: "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+  - name: "The Guardian World"
+    url: "https://www.theguardian.com/world/rss"
+ 

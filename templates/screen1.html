@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen 1: Headlines</title>
+    <link rel="stylesheet" href="/static/css/screen1.css">
+</head>
+<body>
+    <div id="news-container">
+        <!-- 뉴스 카드가 여기에 동적으로 추가됩니다 -->
+    </div>
+
+    <script>
+        let lastNewsTitle = "";
+
+        async function fetchNews() {
+            try {
+                const response = await fetch('/api/current_display?t=' + Date.now());
+                const data = await response.json();
+                
+                if (data.status === "ready" && data.news) {
+                    const latestNews = data.news;
+                    
+                    // 새로운 뉴스인지 확인
+                    if (data.guid !== lastNewsTitle) {
+                        lastNewsTitle = data.guid;
+                        renderNews(latestNews);
+                    }
+                }
+            } catch (err) {
+                console.error("News fetch error:", err);
+            }
+        }
+
+        function renderNews(news) {
+            const container = document.getElementById('news-container');
+            container.innerHTML = ''; // 기존 컴포넌트 비우기
+
+            const card = document.createElement('div');
+            card.className = 'news-card new-item';
+
+            const title = document.createElement('h1');
+            title.className = 'news-title';
+            title.textContent = news.title;
+            
+            card.appendChild(title);
+            container.appendChild(card);
+        }
+
+        // 초기 로드
+        fetchNews();
+        
+        // 2초마다 상태 갱신 확인
+        setInterval(fetchNews, 2000);
+    </script>
+</body>
+</html>

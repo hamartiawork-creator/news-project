@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exhibition Control Dashboard</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+    <div class="dashboard">
+        <h1>제어 대시보드 (Control Panel)</h1>
+        
+        <div class="form-group">
+            <label for="apikey">OpenAI API Key 설정</label>
+            <input type="text" id="apikey" placeholder="sk-..." onchange="saveSettings()">
+        </div>
+
+        <div class="form-group" style="padding-bottom: 20px; border-bottom: 1px solid #444; margin-bottom: 2rem;">
+            <label for="interval">뉴스 업데이트 수집 주기 (초)</label>
+            <div style="font-size: 0.85rem; color: #999; margin-bottom: 5px;">
+                서버가 실시간으로 전 세계 뉴스를 가져오는 빈도를 설정합니다.
+            </div>
+            <input type="number" id="interval" value="60" onchange="saveSettings()" style="width: 100px; padding: 10px; font-size: 1rem; border-radius: 4px; background: #1a1a1a; color: white; border: 1px solid #444;">
+        </div>
+
+        <div class="toggle-container">
+            <div>
+                <label style="margin:0">연동 작업 (DALL-E & LLM) 활성화</label>
+                <div style="font-size: 0.85rem; color: #999; margin-top: 5px;">
+                    이 토글을 Off로 하면 API 토큰 비용이 낭비되지 않도록<br>더 이상 새 이미지를 생성하지 않습니다.
+                </div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="activeToggle" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center; border-top: 1px solid #444; padding-top: 20px;">
+            <button onclick="resetNews()" style="background-color: #d32f2f; color: white; border: none; padding: 12px 24px; border-radius: 4px; font-size: 1rem; cursor: pointer; transition: background 0.3s; font-weight: bold;">
+                🛑 기사 출력 초기화 (최신순 다시 시작)
+            </button>
+            <div style="font-size: 0.85rem; color: #999; margin-top: 10px;">
+                지금까지 사용된 모든 기사 내역을 삭제하고, 방금 수집된 가장 새로운 예전 기사 첫 번째부터 다시 정주행합니다.
+            </div>
+        </div>
+
+        <div id="status-msg"></div>
+
+        <h2 style="font-size: 1.2rem; margin-top: 2rem; border-top: 1px solid #444; padding-top: 1rem;">전시 스크린 바로가기</h2>
+        <div class="button-grid">
+            <a href="/screen1" target="_blank" class="btn">Screen 1<br><span style="font-size:0.8rem; font-weight:normal;">뉴스 헤드라인</span></a>
+            <a href="/screen2" target="_blank" class="btn">Screen 2<br><span style="font-size:0.8rem; font-weight:normal;">DALL-E 이미지</span></a>
+            <a href="/screen3" target="_blank" class="btn">Screen 3<br><span style="font-size:0.8rem; font-weight:normal;">움직임 지시문</span></a>
+        </div>
+    </div>
+
+    <script>
+        async function resetNews() {
+            if(!confirm("지금까지 출력된 기사 내역을 전부 비우고 다시 처음부터 시작하시겠습니까?")) return;
+            try {
+                const response = await fetch('/api/reset_news', { method: 'POST' });
+                if(response.ok) {
+                    const msg = document.getElementById('status-msg');
+                    msg.innerHTML = "✓ 기사 출력이 완벽하게 초기화되었습니다!";
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => { msg.innerHTML = ""; }, 3000);
+                }
+            } catch (err) {
+                console.error("Reset Error:", err);
+            }
+        }
+        // 초기 로드 시 기존 세팅 가져오기
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/settings');
+                const data = await response.json();
+                
+                document.getElementById('apikey').value = data.api_key || "";
+                document.getElementById('activeToggle').checked = data.is_active !== false;
+                if(data.update_interval) {
+                    document.getElementById('interval').value = data.update_interval;
+                }
+            } catch (err) {
+                console.error("Setting Load Error:", err);
+            }
+        }
+
+        let timeoutId;
+        async function saveSettings() {
+            const api_key = document.getElementById('apikey').value;
+            const is_active = document.getElementById('activeToggle').checked;
+            const update_interval = document.getElementById('interval').value;
+
+            try {
+                const response = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_key, is_active, update_interval })
+                });
+                
+                if(response.ok) {
+                    const msg = document.getElementById('status-msg');
+                    msg.innerHTML = "✓ 설정이 저장되었습니다.";
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => { msg.innerHTML = ""; }, 2000);
+                }
+            } catch (err) {
+                console.error("Setting Save Error:", err);
+            }
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>

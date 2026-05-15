@@ -1,0 +1,64 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: white;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+#news-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 2rem;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 스크롤바 숨기기 (디스플레이용) */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+.news-card {
+    width: 90vw;
+    background-color: white;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    padding: 4rem;
+    
+    /* 텍스트 줄바꿈 허용 */
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.news-title {
+    font-size: clamp(2rem, 5vw, 6rem); /* 화면 크기에 비례하되 너무 커지지 않게 제한 */
+    font-weight: 900; /* 매우 굵게 */
+    color: black;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: -1px;
+}
+
+/* 등장 애니메이션 */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.news-card.new-item {
+    animation: slideDown 1s ease-out forwards;
+}

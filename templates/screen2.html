@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen 2: Latest Image</title>
+    <link rel="stylesheet" href="/static/css/screen2.css">
+</head>
+<body>
+    <div id="image-container">
+        <!-- 이미지가 동적으로 추가됩니다 -->
+    </div>
+
+    <script>
+        let lastNewsGuid = "";
+
+        async function fetchDisplay() {
+            try {
+                const response = await fetch('/api/current_display?t=' + Date.now());
+                const data = await response.json();
+                
+                if (data.status === "ready") {
+                    if (data.guid !== lastNewsGuid) {
+                        lastNewsGuid = data.guid;
+                        if(data.image_url) {
+                            transitionToImage(data.image_url);
+                        } else {
+                            clearImage();
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Latest display fetch error:", err);
+            }
+        }
+
+        function clearImage() {
+            const container = document.getElementById('image-container');
+            const oldImages = container.querySelectorAll('img');
+            oldImages.forEach(img => img.classList.remove('active'));
+            setTimeout(() => {
+                oldImages.forEach(oldImg => {
+                    if(container.contains(oldImg)) container.removeChild(oldImg);
+                });
+            }, 1500);
+        }
+
+        function transitionToImage(newUrl) {
+            const container = document.getElementById('image-container');
+            const oldImages = container.querySelectorAll('img');
+
+            const img = new Image();
+            img.src = newUrl;
+            img.onload = () => {
+                // 새 이미지가 로드된 후에야 기존 이미지들을 fade out 합니다
+                oldImages.forEach(oldImg => oldImg.classList.remove('active'));
+
+                container.appendChild(img);
+                void img.offsetWidth; // 리플로우 연산 강제
+                img.classList.add('active'); // Fade in 시작
+
+                // 트랜지션 이후 오래된 이미지 제거
+                setTimeout(() => {
+                    oldImages.forEach(oldImg => {
+                        if(container.contains(oldImg)) container.removeChild(oldImg);
+                    });
+                }, 5000);
+            };
+        }
+
+        // 초기 로드
+        fetchDisplay();
+        
+        // 2초마다 통합 갱신
+        setInterval(fetchDisplay, 2000);
+        
+    </script>
+</body>
+</html>

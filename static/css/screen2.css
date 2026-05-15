@@ -1,0 +1,65 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#image-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: filter 3s ease-in-out;
+}
+
+#image-container.generating {
+    filter: url(#gloopFilter);
+}
+
+#image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.5s ease-out;
+    mix-blend-mode: normal;
+}
+
+#image-container img.active {
+    opacity: 1;
+}
+
+/* 꿀렁이는 디퓨전을 위한 베이스 그라데이션 오버레이 */
+#gloopOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #111, #333, #000, #2a2a2a);
+    background-size: 400% 400%;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    filter: url(#gloopFilter);
+    transition: opacity 2s ease-in-out;
+    animation: gradientMove 15s ease infinite;
+}
+
+#gloopOverlay.generating {
+    opacity: 1;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}

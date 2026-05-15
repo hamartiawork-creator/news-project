@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Database
+news.db
+*.sqlite3
+
+# Project specific
+out/
+cloudflared.exe
+*.bat

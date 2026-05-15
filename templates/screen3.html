@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen 3: Movement Instructions</title>
+    <link rel="stylesheet" href="/static/css/screen3.css">
+</head>
+<body>
+    <div id="movement-container">
+        <div class="movement-text" id="text-display"></div>
+    </div>
+
+    <script>
+        let lastNewsGuid = "";
+        let isTyping = false;
+
+        async function fetchDisplay() {
+            if (isTyping) return;
+
+            try {
+                const response = await fetch('/api/current_display?t=' + Date.now());
+                const data = await response.json();
+                
+                const display = document.getElementById('text-display');
+
+                if (data.status === "ready" && data.movement_text) {
+                    // guid가 바뀌면 새 뉴스로 인식
+                    if (data.guid !== lastNewsGuid) {
+                        lastNewsGuid = data.guid;
+                        typeText(data.movement_text);
+                    }
+                }
+            } catch (err) {
+                console.error("Latest display fetch error:", err);
+            }
+        }
+
+        function typeText(text) {
+            isTyping = true;
+            
+            // 1초(1000ms) 대기 후 기존 텍스트를 지우고 타이핑을 시작합니다
+            setTimeout(() => {
+                const display = document.getElementById('text-display');
+                display.innerHTML = '';
+                
+                // 개행문자 정규화
+                const formattedText = text.replace(/\\n/g, '\n');
+                let index = 0;
+                
+                function typeNext() {
+                    if (index < formattedText.length) {
+                        const char = formattedText.charAt(index);
+                        
+                        if (char === '\n') {
+                            display.innerHTML += '<br>';
+                        } else {
+                            // XSS 방지를 위해 텍스트 노드 추가 방식 대신 문자 치환
+                            display.innerHTML += (char === '<' ? '&lt;' : (char === '>' ? '&gt;' : char));
+                        }
+                        
+                        index++;
+                        // 한글자 타이핑마다 랜덤 딜레이
+                        const delay = Math.random() * 50 + 30;
+                        setTimeout(typeNext, delay);
+                    } else {
+                        isTyping = false;
+                    }
+                }
+                
+                typeNext();
+            }, 1000);
+        }
+
+        // 초기 로드
+        fetchDisplay();
+        
+        // 2초마다 통합 상태 갱신
+        setInterval(fetchDisplay, 2000);
+    </script>
+</body>
+</html>
