@@ -37,7 +37,7 @@ def load_env():
     return env
 
 ENV = load_env()
-OPENAI_API_KEY = ENV.get("OPENAI_API_KEY", "")
+OPENAI_API_KEY = ENV.get("OPENAI_API_KEY", os.environ.get("OPENAI_API_KEY", ""))
 
 class PresentationState:
     status = "ready" # "generating" or "ready"
