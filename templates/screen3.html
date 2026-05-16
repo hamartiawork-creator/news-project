@@ -25,6 +25,13 @@
                 const display = document.getElementById('text-display');
 
                 if (data.status === "ready" && data.movement_text) {
+                    if (data.font_size_px) {
+                        const textElement = document.querySelector('.movement-text');
+                        if (textElement) {
+                            textElement.style.fontSize = data.font_size_px + 'px';
+                        }
+                    }
+
                     // guid가 바뀌면 새 뉴스로 인식
                     if (data.guid !== lastNewsGuid) {
                         lastNewsGuid = data.guid;

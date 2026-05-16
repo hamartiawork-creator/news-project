@@ -46,6 +46,7 @@ class PresentationState:
     movement_text = ""
     guid = ""
     force_next = False
+    font_size_px = 80
 
 class RequestHandler(BaseHTTPRequestHandler):
     IS_ACTIVE = True
@@ -77,7 +78,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 "news": PresentationState.news,
                 "image_url": PresentationState.image_url,
                 "movement_text": PresentationState.movement_text,
-                "guid": PresentationState.guid
+                "guid": PresentationState.guid,
+                "font_size_px": PresentationState.font_size_px
             }
             try:
                 self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
@@ -92,7 +94,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({
                 "api_key": OPENAI_API_KEY,
                 "is_active": RequestHandler.IS_ACTIVE,
-                "update_interval": RequestHandler.UPDATE_INTERVAL
+                "update_interval": RequestHandler.UPDATE_INTERVAL,
+                "font_size_px": PresentationState.font_size_px
             }, ensure_ascii=False).encode('utf-8'))
 
         elif path in ['/', '/index', '/screen1', '/screen2', '/screen3']:
@@ -166,6 +169,13 @@ class RequestHandler(BaseHTTPRequestHandler):
                 try:
                     RequestHandler.UPDATE_INTERVAL = int(data["update_interval"])
                     print(f"새로운 뉴스 업데이트 주기: {RequestHandler.UPDATE_INTERVAL}초")
+                except ValueError:
+                    pass
+                    
+            if "font_size_px" in data:
+                try:
+                    PresentationState.font_size_px = int(data["font_size_px"])
+                    print(f"새로운 폰트 크기: {PresentationState.font_size_px}px")
                 except ValueError:
                     pass
                 
